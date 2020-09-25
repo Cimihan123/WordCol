@@ -132,19 +132,19 @@ curling() {
 
         echo "${Yellow}Curling${NC}"
         echo '\n'
-        echo $domain | httpx -threads 4 -o http.txt
+        echo $domain | httpx -threads 4 -o httpx.txt
         curl https://tools.ietf.org/html/rfc1866 -o rfc.html
         cat httpx.txt | xargs curl -s -L >> curled.html
         cat curled.html | tok | tr '[:upper:]' '[:lower:]' | sort -u > curled.txt
         cat rfc.html | tok | tr '[:upper:]' '[:lower:]' | sort -u > rfc.txt
         comm -13 rfc.txt curled.txt | sort -u | tee -a words.txt
-        rm http.txt
+        rm httpx.txt rfc.html rfc.txt curled.txt curled.html
 
 }
 
 
 
-jsles(){
+jsfiles(){
 
 
 
@@ -261,6 +261,8 @@ loopcurling() {
         cat curled.html | tok | tr '[:upper:]' '[:lower:]' | sort -u > curled.txt
         cat rfc.html | tok | tr '[:upper:]' '[:lower:]' | sort -u > rfc.txt
         comm -13 rfc.txt curled.txt | sort -u | tee -a words.txt
+        rm rfc.html rfc.txt curled.txt curled.html
+
 
 }
 
@@ -370,7 +372,7 @@ singleSorting() {
 
     rm endpoint/wordlists.txt
     sort -u endpoint/wordlist.txt > endpoint/wordlists.txt
-    rm endpoint/wordlist.txt
+    rm endpoint/wordlist.txt do.txt 
 
 }
 
@@ -395,7 +397,7 @@ sigleMain() {
         #single
             hakcrawl
             Endpoints
-            jsles
+            jsfiles
             curling
             wayback
 
@@ -480,5 +482,4 @@ if [ "$domains" = '' ] && [ "$domain" = ''  ] && [ "$file" = ''  ]; then
     	Usage
 
 fi
-
 
