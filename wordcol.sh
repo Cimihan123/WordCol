@@ -115,13 +115,19 @@ Endpoints() {
 
 
 
-        echo "${Yellow}Endpoints${NC}"
-        echo "\n"
-        gau $domain | tee gau.txt | unfurl -u keys | tee -a wordlist.txt ; gau $domain | unfurl -u paths|tee -a ends.txt; sed 's#/#\n#g' ends.txt  | sort -u | tee -a wordlist.txt | sort -u ;rm ends.txt  | sed -i -e 's/\.css\|\.png\|\.jpeg\|\.jpg\|\.svg\|\.gif\|\.wolf\|\.bmp//g' wordlist.txt
+        echo "${Yellow}[+] Endpoints - ${Green}$domain${NC}"
+       
+      
+        gau $domain | tee -a gau.txt >/dev/null
+        cat gau.txt | unfurl -u keys  | tee -a ends.txt   >/dev/null
+        cat gau.txt | unfurl -u paths | tee -a ends.txt   >/dev/null
+        sed 's#/#\n#g' ends.txt  | sort -u | tee -a wordlist.txt   >/dev/null
 
+        rm ends.txt
+       
     
 
-         rm gau.txt
+     
 
 }
 
@@ -130,14 +136,14 @@ Endpoints() {
 curling() {
 
 
-        echo "${Yellow}Curling${NC}"
-        echo '\n'
-        echo $domain | httpx -threads 4 -o httpx.txt
-        curl https://tools.ietf.org/html/rfc1866 -o rfc.html
-        cat httpx.txt | xargs curl -s -L >> curled.html
-        cat curled.html | tok | tr '[:upper:]' '[:lower:]' | sort -u > curled.txt
-        cat rfc.html | tok | tr '[:upper:]' '[:lower:]' | sort -u > rfc.txt
-        comm -13 rfc.txt curled.txt | sort -u | tee -a words.txt
+        echo "${Yellow}[+] Curling - ${Green}$domain${NC}"
+      
+        echo $domain | httpx -threads 4 -o httpx.txt -silent 
+        curl https://tools.ietf.org/html/rfc1866 -o rfc.html  -s
+        cat httpx.txt | xargs curl -s -L | tee -a curled.html >/dev/null
+        cat curled.html | tok | tr '[:upper:]' '[:lower:]' | sort -u | tee -a  curled.txt   >/dev/null
+        cat rfc.html | tok | tr '[:upper:]' '[:lower:]' | sort -u |   tee -a rfc.txt   >/dev/null
+        comm -13 rfc.txt curled.txt | sort -u | tee -a words.txt >/dev/null
         rm httpx.txt rfc.html rfc.txt curled.txt curled.html
 
 }
@@ -148,10 +154,11 @@ jsfiles(){
 
 
 
-        echo "${Yellow}From JS les${NC}"
-        echo '\n'
-        gau $domain | head -n 1000 | fff -s 200 -s 404 -o out
-        grep -roh "\"\/[a-zA-Z0-9_/?=&]*\"" out/ | sed -e 's/^"//' -e 's/"$//' | sort -u | tee -a words.txt
+        echo "${Yellow}[+] JsFiles - ${Green}"
+   
+        cat gau.txt | head -n 1000 | fff -s 200 -s 404 -o out >/dev/null
+        grep -roh "\"\/[a-zA-Z0-9_/?=&]*\"" out/ | sed -e 's/^"//' -e 's/"$//' | sort -u | tee -a words.txt   >/dev/null
+        rm gau.txt
 
 
 
@@ -161,19 +168,19 @@ jsfiles(){
 wayback(){
 
 
-        echo "${Yellow}Waybackurls"${NC}
-        echo "\n"
-        echo $domain | waybackurls | tee -a way.txt
-        cat way.txt | unfurl -u keys| tee -a wayback.txt
-        cat way.txt |unfurl -u paths|tee -a wayback.txt
-        sed 's#/#\n#g' wayback.txt  |sort -u |tee -a waybacks.txt
+       echo "${Yellow}[+] WaybackUrls - ${Green}$domain${NC}"
+        
+        echo $domain | waybackurls | tee -a way.txt >/dev/null
+        cat way.txt | unfurl -u keys| tee -a wayback.txt >/dev/null
+        cat way.txt |unfurl -u paths|tee -a wayback.txt >/dev/null
+        sed 's#/#\n#g' wayback.txt  |sort -u |tee -a waybacks.txt >/dev/null
         rm wayback.txt  
 
 
 
  
 
-	rm way.txt
+	    rm way.txt
 
 
 
@@ -186,157 +193,33 @@ wayback(){
 
 
 hakcrawl(){
-    echo $domain
+
+        
+       
+        echo "${Yellow}[+] Hakcrawling - ${Green}$domain${NC}"
+       
+        echo $domain | hakrawler -plain -usewayback -scope yolo | unfurl -u keys  | sort -u | tee -a words.txt >/dev/null
+        echo $domain | hakrawler -plain -usewayback -scope yolo | unfurl -u paths | sort -u | tee -a words.txt >/dev/null
 
 
-        echo "${Yellow} Hakcrawler${NC}"
-        echo "\n"
-        echo $domain | hakrawler -plain -usewayback -scope yolo | unfurl -u keys  | sort -u | tee -a words.txt
-        echo $domain | hakrawler -plain -usewayback -scope yolo | unfurl -u paths | sort -u | tee -a words.txt
-
-
- }
-
-
-
-
-
-#Looping
-
-
-loopEndpoints() {
-
-
-        echo "${Yellow}loopEndpoints${NC}"
-        echo '\n'
-        for i in $(cat $domains);
-        do
-        gau $i| tee -a gau.txt |  unfurl -u keys | tee -a wordlist.txt ; gau $i | unfurl -u paths|tee -a end.txt; sed 's#/#\n#g' end.txt  | sort -u | tee -a test.txt | sort -u ;rm end.txt  | sed -i -e 's/\.css\|\.png\|\.jpeg\|\.jpg\|\.svg\|\.gif\|\.wolf\|\.bmp//g' test.txt
-        done
-
-
-
-        rm gau.txt
-
-
- }
-
-
-
-
-loopWayback(){
-
-
-        echo "${Yellow}loopWaybackurls"${NC}
-        echo "\n"
-        cat $domains | waybackurls | tee way.txt
-
-        cat way.txt | unfurl -u keys| tee -a wayback.txt
-        cat way.txt |unfurl -u paths|tee -a wayback.txt
-        sed 's#/#\n#g' wayback.txt  |sort -u |tee -a waybacks.txt
-        rm wayback.txt   
-
-
-
-
-        rm way.txt
-
-
-    }
+} 
 
 
 
 
 
 
-loopcurling() {
 
 
 
-        echo "${Yellow}loopCurling${NC}"
-        echo '\n'
-        cat $domains | httpx -threads 4 -o httpx.txt
-        curl https://tools.ietf.org/html/rfc1866 -o rfc.html
-        cat httpx.txt | xargs curl -s -L >> curled.html
-        cat curled.html | tok | tr '[:upper:]' '[:lower:]' | sort -u > curled.txt
-        cat rfc.html | tok | tr '[:upper:]' '[:lower:]' | sort -u > rfc.txt
-        comm -13 rfc.txt curled.txt | sort -u | tee -a words.txt
-        rm rfc.html rfc.txt curled.txt curled.html
+Sorting() {
 
 
-}
-
-loopHarkcrawl(){
-
-
-
-        echo "${Yellow}loopHakcrawler${NC}"
-        echo "\n"
-        cat httpx.txt | hakrawler -plain -usewayback -scope yolo | unfurl -u keys  | sort -u  | tee -a words.txt
-        cat httpx.txt | hakrawler -plain -usewayback -scope yolo | unfurl -u paths| sort -u  |tee -a words.txt
-        rm httpx.txt
-
- }
-
-
-
-
-loopSorting() {
-
-
-        echo "${Yellow}Loop Sorintg${NC} "
+        echo "${Yellow} Sortintg${NC} "
         echo "\n"
         mkdir endpoint
-        sort -u  words.txt sorted.txt wordlist.txt test.txt waybacks.txt > endpoint/sort.txt
-        cat endpoint/sort.txt | grep -iv '.css$\|.png$\|.jpeg$\|.jpg$\|.svg$\|.gif$\|.woff$\|.woff2$\|.bmp$\|.mp4$\|.mp3$\|.js$' | tee -a endpoint/wordlists.txt
-
-        rm words.txt endpoint/sort.txt wordlist.txt test.txt waybacks.txt
-
-
-
-
-	#checking if starting word is '/' or not
-	for i in $(cat endpoint/wordlists.txt);do
-	    starting=$(echo $i | awk '{print substr ($0,0,1)}' )
-	    if [ $starting = '/' ];then
-		echo $i >> do.txt
-	    else
-		echo '/'$i >> do.txt
-	    fi
-
-	done
-
-	#checking if ending word is '/' or not
-
-	for i in $(cat do.txt);do
-	    end=$(echo $i | awk '{print substr ($0,length,1)}' )
-	    if [ $end = '/' ];then
-		echo $i | rev | cut -c 2-  |rev   >> endpoint/wordlist.txt
-	    else
-		echo $i >> endpoint/wordlist.txt
-	    fi
-
-	done
-
-    rm endpoint/wordlists.txt
-    sort -u endpoint/wordlist.txt > endpoint/wordlists.txt
-    rm endpoint/wordlist.txt
-
-
-	
-
-
-}
-
-
-singleSorting() {
-
-
-        echo "${Yellow}Single Sorintg${NC} "
-        echo "\n"
-        mkdir endpoint
-        sort -u words.txt wordlist.txt waybacks.txt   > endpoint/sorted.txt
-        cat endpoint/sorted.txt | grep -iv '.css$\|.png$\|.jpeg$\|.jpg$\|.svg$\|.gif$\|.woff$\|.woff2$\|.bmp$\|.mp4$\|.mp3$\|.js$'  | tee -a endpoint/wordlists.txt
+        sort -u words.txt wordlist.txt waybacks.txt |tee -a endpoint/sorted.txt >/dev/null
+        cat endpoint/sorted.txt | grep -iv '.css$\|.png$\|.jpeg$\|.jpg$\|.svg$\|.gif$\|.woff$\|.woff2$\|.bmp$\|.mp4$\|.mp3$\|.js$'  | tee -a endpoint/wordlists.txt >/dev/null
 
         rm words.txt  wordlist.txt waybacks.txt endpoint/sorted.txt
 
@@ -349,9 +232,9 @@ singleSorting() {
 	for i in $(cat endpoint/wordlists.txt);do
 	    starting=$(echo $i | awk '{print substr ($0,0,1)}' )
 	    if [ $starting = '/' ];then
-		echo $i >> do.txt
+		    echo $i >> do.txt
 	    else
-		echo '/'$i >> do.txt
+		    echo '/'$i >> do.txt
 	    fi
 
 	done
@@ -361,9 +244,9 @@ singleSorting() {
 	for i in $(cat do.txt);do
 	    end=$(echo $i | awk '{print substr ($0,length,1)}' )
 	    if [ $end = '/' ];then
-		echo $i | rev | cut -c 2-  |rev   >> endpoint/wordlist.txt
-	    else
-		echo $i >> endpoint/wordlist.txt
+            echo $i | rev | cut -c 2-  |rev   >> endpoint/wordlist.txt
+        else
+            echo $i >> endpoint/wordlist.txt
 	    fi
 
 	done
@@ -371,8 +254,12 @@ singleSorting() {
 
 
     rm endpoint/wordlists.txt
-    sort -u endpoint/wordlist.txt > endpoint/wordlists.txt
-    rm endpoint/wordlist.txt do.txt 
+    sort -u endpoint/wordlist.txt|tee  -a endpoint/wordlists.txt >/dev/null
+    rm endpoint/wordlist.txt do.txt
+
+
+    echo "${Yellow}Sortintg Finish ${NC} "
+    echo "\n"
 
 }
 
@@ -392,50 +279,67 @@ sigleMain() {
 
         echo 'Single starts'
         cc=$(echo $domain | wc -l)
-        if [ $cc -eq 1 ] && [ $domain != ''  ]
-        then
-        #single
-            hakcrawl
-            Endpoints
-            jsfiles
-            curling
-            wayback
+     
+            if [ $cc -eq 1 ] && [ $domain != ''  ] ;
+            then
+            #single
+                
+                Endpoints
+                hakcrawl
+                
+                curling
+                wayback
+                jsfiles
+
+                #sorting
+                Sorting
 
 
-        #sorting
-            singleSorting
 
-        else
-            echo  "${Cyan}Invalid"
-         fi
+           
 
+            else
+                echo  "${Cyan}Invalid"
+            fi
+        	
+          
 
 
 }
+
 
 loopMain(){
 
-         echo "${Yellow}Looping starts\n${NC}"
-         cc=$(cat $domains | wc | awk '{ print $1}')
-         if [ $cc -gt 0 ]
-         then
+        echo "${Yellow}Looping starts\n${NC}"
+        cc=$(cat $domains | wc | awk '{ print $1}')
+        while read domain; do
+            if [ $cc -gt 0 ];
+            then
 
-            #loop
-            loopcurling
-            loopHarkcrawl
-            loopEndpoints
-            loopWayback
+                #loop
+                
+                hakcrawl
+                Endpoints
+            
+                curling
+                wayback
 
+           
+            
+            else
+            echo  "${Cyan}Invalid or File is Empty"
+            fi
+        done < $domains
 
-            #sorting
-            loopSorting
-         else
-           echo  "${Cyan}Invalid or File is Empty"
-         fi
+             jsfiles
+             #sorting
+                Sorting
+
+    
+      
 
 
 }
-
 
 
 
@@ -482,4 +386,5 @@ if [ "$domains" = '' ] && [ "$domain" = ''  ] && [ "$file" = ''  ]; then
     	Usage
 
 fi
+
 
