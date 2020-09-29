@@ -47,17 +47,17 @@ EOF
 
 urlsFile(){
 
-    echo "${Yellow}urlsFile${NC}"
-    echo "\n"
-
+    echo "${Yellow} [+] UrlsFile${NC}"
+   
    
     cat $file | unfurl -u keys  | tee file.txt >/dev/null
     cat $file | unfurl -u paths | tee -a file.txt >/dev/null
     sed 's#/#\n#g' file.txt  | sort -u | tee -a endpoints.txt    >/dev/null
 
 
-    mkdir endpoint/ >/dev/null
+    mkdir endpoint/ 2>/dev/null
     cat $file | head -n 1000 | fff -s 200 -s 404 -o out >/dev/null
+     echo "${Yellow}[*] Greping${NC}"
     grep -roh "\"\/[a-zA-Z0-9_/?=&]*\"" out/ | sed -e 's/^"//' -e 's/"$//' | sort -u | tee -a endpoints.txt >/dev/null
 
     #sorting
@@ -67,6 +67,8 @@ urlsFile(){
 
     rm file.txt
     rm -rdf out/
+
+    echo "${Yellow}   [+]Done${NC}"
 
 
 
