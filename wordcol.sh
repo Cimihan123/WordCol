@@ -155,9 +155,13 @@ curling() {
 jsfiles(){
 
         echo -e "${Orange}[+] JsFiles - ${L1Yellow}$domain${NC}"
-   
-        cat gau.txt | head -n 1000 | fff -s 200 -s 404 -o out >/dev/null
+        #part-1
+        cat gau.txt | head -n 1000 | fff -s 200 -s 404 -o out 2>/dev/null
         grep -roh "\"\/[a-zA-Z0-9_/?=&]*\"" out/ | sed -e 's/^"//' -e 's/"$//' | sort -u | tee -a words.txt  >/dev/null
+
+        #part-2
+        cat way.txt | grep "\.js"| anew |rush -j 50 'wget -P js/ {}'   2>/dev/null
+        cat js/*  | grep -aoP "(?<=(\"|\'|\`))\/[a-zA-Z0-9_?&=\/\-\#\.]*(?=(\"|\'|\`))" | sort -u | tee -a words.txt >/dev/null
        
 }
 
@@ -193,16 +197,16 @@ Sorting() {
         
         mkdir endpoint 2>/dev/null
         cat words.txt wordlist.txt waybacks.txt |  sort -u  |tee -a endpoint/sorted.txt >/dev/null
-        cat endpoint/sorted.txt | grep -iv '.css$\|.png$\|.jpeg$\|.jpg$\|.svg$\|.gif$\|.woff$\|.woff2$\|.bmp$\|.mp4$\|.mp3$\|.js$'  | tee -a endpoint/wordlists.txt >/dev/null
+        cat endpoint/sorted.txt | grep -iv '.css\|.png\|.jpeg\|.jpg\|.svg\|.gif\|.woff\|.woff2\|.bmp\|.mp4\|.mp3\|.js'  | tee -a endpoint/wordlists.txt >/dev/null
 
-        rm words.txt  wordlist.txt waybacks.txt endpoint/sorted.txt
+        rm words.txt  wordlist.txt waybacks.txt endpoint/sorted.txt 2>/dev/null
 
         #slasher function
         slasher
 
-        rm endpoint/wordlists.txt
+        rm endpoint/wordlists.txt 2>/dev/null
         cat endpoint/wordlist.txt |  sort -u | tee  -a endpoint/endpoints.txt >/dev/null
-        rm endpoint/wordlist.txt do.txt
+        rm endpoint/wordlist.txt do.txt 2>/dev/null
 
 
         echo -e "[*] ${Red} Sorted ${NC} [*]"
