@@ -1,5 +1,5 @@
 # WordCol
-**It will generate the custom wordlist automatically for the given domains/domains.**
+**It will generate the custom wordlist automatically for the given domain/domains.**
 
 # Easy to Use
 ```
